@@ -565,7 +565,135 @@ textarea.ta-input { resize: vertical; min-height: 64px; line-height: 1.6; }
 </head>
 <body>
 
+  <!-- ══════════════════════════════════════════════
+       🔒 PASSWORD GATE UI
+       ══════════════════════════════════════════════ -->
+  <div id="gate">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800&display=swap');
+      #gate {
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, #0a0f1e 0%, #0f172a 50%, #1e3a5f 100%);
+        font-family: 'Noto Sans TC', -apple-system, sans-serif;
+      }
+      #gate-box {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.12);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 44px 40px;
+        width: 100%; max-width: 400px;
+        box-shadow: 0 32px 64px rgba(0,0,0,0.5);
+        text-align: center; box-sizing: border-box;
+      }
+      #gate-logo { font-size: 40px; margin-bottom: 8px; }
+      #gate-title { color: #fff; font-size: 20px; font-weight: 800; margin: 0 0 4px; }
+      #gate-subtitle { color: rgba(255,255,255,0.4); font-size: 12px; margin: 0 0 32px; }
+      #gate-label {
+        color: rgba(255,255,255,0.55); font-size: 11px; font-weight: 600;
+        text-align: left; display: block; margin-bottom: 7px;
+        letter-spacing: 0.8px; text-transform: uppercase;
+      }
+      #pw-input {
+        width: 100%; padding: 13px 16px; border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.07); color: #fff;
+        font-size: 16px; font-weight: 600; outline: none;
+        box-sizing: border-box; letter-spacing: 3px;
+        transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 14px;
+      }
+      #pw-input::placeholder { color: rgba(255,255,255,0.2); letter-spacing: 0; font-size: 13px; }
+      #pw-input:focus { border-color: rgba(59,130,246,0.7); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+      #pw-input.error {
+        border-color: rgba(239,68,68,0.8) !important;
+        box-shadow: 0 0 0 3px rgba(239,68,68,0.2) !important;
+        animation: gate-shake 0.35s ease;
+      }
+      @keyframes gate-shake {
+        0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)}
+      }
+      #pw-btn {
+        width: 100%; padding: 13px; border-radius: 10px; border: none;
+        background: linear-gradient(135deg, #2563eb, #1e40af);
+        color: #fff; font-size: 14px; font-weight: 700; cursor: pointer;
+        transition: all 0.2s; box-shadow: 0 4px 14px rgba(37,99,235,0.4);
+        font-family: 'Noto Sans TC', -apple-system, sans-serif;
+      }
+      #pw-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.5); }
+      #pw-btn:active { transform: translateY(0); }
+      #pw-error { color: #fca5a5; font-size: 12px; font-weight: 600; margin-top: 10px; min-height: 18px; }
+      #gate-footer { color: rgba(255,255,255,0.18); font-size: 10.5px; margin-top: 28px; }
+    </style>
+    <div id="gate-box">
+      <div id="gate-logo">📝</div>
+      <h1 id="gate-title">SEO 大綱生產系統</h1>
+      <p id="gate-subtitle">請輸入密碼以繼續 &nbsp;&middot;&nbsp; Internal Use Only</p>
+      <label id="gate-label" for="pw-input">Access Password</label>
+      <input id="pw-input" type="password" placeholder="輸入工作區密碼" autocomplete="current-password" />
+      <button id="pw-btn" onclick="gateSubmit()">🔓 &nbsp;進入系統</button>
+      <div id="pw-error"></div>
+      <div id="gate-footer">&copy; Wuhe Content Team &nbsp;&middot;&nbsp; 僅限內部使用</div>
+    </div>
+  </div>
+
+  <!-- 主程式（密碼驗證後才顯示） -->
+  <div id="app-root" style="display:none">
+
+  <!-- ══════════════════════════════════════════════
+       🔒 PASSWORD GATE LOGIC
+       ▶ 修改密碼：把 SITE_PASSWORD 改成你要的密碼即可
+       ══════════════════════════════════════════════ -->
+  <script>
+    var SITE_PASSWORD = 'seocontent';  // ◄══ 修改密碼在這裡
+    var AUTH_KEY = 'seo_auth_v1';      // sessionStorage key
+
+    /* 頁面載入時：若已驗證（同一分頁內），就直接繼續 */
+    (function checkAuth() {
+      if (sessionStorage.getItem(AUTH_KEY) === '1') {
+        document.getElementById('gate').style.display = 'none';
+        document.getElementById('app-root').style.display = '';
+      } else {
+        window.addEventListener('DOMContentLoaded', function() {
+          document.getElementById('pw-input').focus();
+        });
+      }
+    })();
+
+    /* Enter 鍵提交 */
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('pw-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') gateSubmit();
+      });
+    });
+
+    function gateSubmit() {
+      var input = document.getElementById('pw-input');
+      var errEl = document.getElementById('pw-error');
+      var val   = input.value; // 區分大小寫，不 trim
+
+      if (val === SITE_PASSWORD) {
+        /* ✅ 驗證成功 */
+        sessionStorage.setItem(AUTH_KEY, '1');
+        document.getElementById('gate').style.display = 'none';
+        document.getElementById('app-root').style.display = '';
+      } else {
+        /* ❌ 驗證失敗 */
+        errEl.textContent = '⚠️ 密碼錯誤，請再試一次';
+        input.classList.add('error');
+        input.value = '';
+        setTimeout(function() {
+          input.classList.remove('error');
+          errEl.textContent = '';
+          input.focus();
+        }, 1800);
+      }
+    }
+  </script>
+
 <div class="header">
+
   <div class="logo">
     <div class="logo-dot"></div>
     SEO 大綱生產系統
@@ -2046,5 +2174,6 @@ addComp();
 updatePrompts();
 updateNav();
 </script>
+  </div><!-- /#app-root -->
 </body>
 </html>
