@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEO 大綱生產系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F6F3;
+  --surface: #FFFFFF;
+  --surface2: #F2F0EC;
+  --border: #E2DFD9;
+  --border-strong: #C8C4BC;
+  --text: #1A1816;
+  --text2: #6B6560;
+  --text3: #A09A93;
+  --accent: #2B5CE6;
+  --accent-bg: #EEF2FD;
+  --accent-border: #C4D0F7;
+  --green: #1A7F5A;
+  --green-bg: #EBF7F2;
+  --green-border: #A8DECA;
+  --amber: #8A5A00;
+  --amber-bg: #FDF5E6;
+  --amber-border: #F0D08A;
+  --red: #C0392B;
+  --red-bg: #FDF0EE;
+  --red-border: #F5C0BA;
+  --teal: #0F6E56;
+  --teal-bg: #E6F4F0;
+  --purple: #4A3AB5;
+  --purple-bg: #EEECFB;
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.04);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* HEADER */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  white-space: nowrap;
+}
+.logo-dot {
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+.header-tabs {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+.htab {
+  padding: 6px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text2);
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  transition: all .15s;
+}
+.htab:hover { background: var(--surface2); color: var(--text); }
+.htab.active { background: var(--accent-bg); color: var(--accent); font-weight: 500; }
+
+/* LAYOUT */
+.layout { display: flex; min-height: calc(100vh - 56px); }
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+.main {
+  flex: 1;
+  padding: 28px 32px;
+  max-width: 860px;
+}
+
+/* SIDEBAR NAV */
+.kw-section {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.kw-label { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+.kw-input-wrap { display: flex; flex-direction: column; gap: 6px; }
+.kw-input {
+  width: 100%; padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px; font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  transition: border .15s;
+}
+.kw-input:focus { outline: none; border-color: var(--accent); }
+.kw-apply {
+  padding: 7px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.kw-apply:hover { opacity: .88; }
+.kw-badge {
+  display: none;
+  margin-top: 6px;
+  padding: 5px 8px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--accent);
+  font-family: 'DM Mono', monospace;
+  word-break: break-all;
+}
+
+.nav-label { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: .08em; text-transform: uppercase; margin: 10px 0 6px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background .15s;
+  color: var(--text2);
+  font-size: 13px;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--accent-bg); color: var(--accent); font-weight: 500; }
+.nav-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+}
+.n1 { background: #deeafb; color: #0C447C; }
+.n2 { background: #d7f0e2; color: #1A5C3A; }
+.n3 { background: #fde8c8; color: #7A4800; }
+.n4 { background: #e8e5fb; color: #3C3489; }
+.n5 { background: #d4f0e8; color: #0F5C46; }
+.n-done { background: var(--green-bg) !important; color: var(--green) !important; }
+.nav-item .check { font-size: 10px; margin-left: auto; color: var(--green); display: none; }
+.nav-item.done-step .check { display: block; }
+
+.progress-bar-wrap { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+.prog-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+.prog-bar { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .4s ease; }
+.prog-text { font-size: 11px; color: var(--text3); margin-top: 4px; text-align: right; }
+
+/* VIEWS */
+.view { display: none; }
+.view.active { display: block; }
+
+/* STEP CARD */
+.step-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.step-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s;
+}
+.step-header:hover { background: var(--surface2); }
+.step-badge {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.step-info { flex: 1; }
+.step-tool { font-size: 11px; color: var(--text3); margin-bottom: 2px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+.step-title { font-size: 15px; font-weight: 500; }
+.step-toggle { font-size: 13px; color: var(--text3); transition: transform .2s; }
+.step-toggle.open { transform: rotate(180deg); }
+.step-body { display: none; padding: 0 20px 20px; border-top: 1px solid var(--border); }
+.step-body.open { display: block; }
+
+/* TOOL LINK */
+.tool-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin: 14px 0 16px;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface2);
+  text-decoration: none;
+  transition: all .15s;
+}
+.tool-link:hover { border-color: var(--border-strong); background: var(--bg); }
+
+/* PROMPT AREA */
+.field-label {
+  font-size: 12px; font-weight: 500; color: var(--text2);
+  margin-top: 14px; margin-bottom: 6px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.field-label span { font-size: 11px; color: var(--text3); font-weight: 400; }
+.prompt-wrap { position: relative; }
+.prompt-ta {
+  width: 100%; padding: 12px 48px 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 13px; line-height: 1.75;
+  color: var(--text);
+  background: var(--bg);
+  resize: vertical; min-height: 160px;
+  font-family: 'DM Mono', monospace;
+}
+.prompt-ta:focus { outline: none; border-color: var(--accent); }
+.copy-btn {
+  position: absolute; top: 8px; right: 8px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 11px; font-weight: 500;
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+}
+.copy-btn:hover { border-color: var(--border-strong); color: var(--text); }
+.copy-btn.copied { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+
+/* RESULT AREA */
+.result-ta {
+  width: 100%; padding: 11px 13px;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  font-size: 13px; line-height: 1.75;
+  color: var(--text);
+  background: var(--surface);
+  resize: vertical; min-height: 90px;
+  font-family: inherit;
+  transition: border .15s;
+}
+.result-ta:focus { outline: none; border-color: var(--accent); border-style: solid; }
+.result-ta.filled { border-style: solid; border-color: var(--green-border); }
+
+/* NOTICE BOX */
+.notice {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px; line-height: 1.7;
+  margin-top: 12px;
+}
+.notice.red { background: var(--red-bg); border: 1px solid var(--red-border); color: #7A1F16; }
+.notice.red strong { color: var(--red); }
+.notice.amber { background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber); }
+
+/* FORMAT PREVIEW */
+.format-preview {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  font-size: 13px; line-height: 1.9;
+}
+.fp-h2 { font-weight: 500; color: var(--text); }
+.fp-h3 { color: var(--text2); padding-left: 14px; }
+.fp-eg { color: var(--text3); padding-left: 14px; font-style: italic; }
+.fp-red { color: var(--red); padding-left: 14px; font-size: 12px; }
+.fp-link { color: var(--accent); text-decoration: underline; }
+
+/* SAVE ROW */
+.save-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px; font-family: inherit; font-weight: 500;
+  cursor: pointer; border: 1px solid;
+  transition: all .15s;
+}
+.btn-green { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+.btn-green:hover { background: #c5ead9; }
+.btn-blue { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); }
+.btn-blue:hover { background: #d4dffb; }
+.btn-ghost { background: var(--surface); color: var(--text2); border-color: var(--border); }
+.btn-ghost:hover { background: var(--surface2); color: var(--text); }
+.btn-danger { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
+.btn-danger:hover { background: #f9d5d0; }
+.saved-flash { font-size: 12px; color: var(--green); opacity: 0; transition: opacity .3s; }
+.saved-flash.show { opacity: 1; }
+
+/* STEP 5 */
+.step5-merge {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-top: 12px;
+}
+.merge-note { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 12px; }
+.merge-note strong { color: var(--text); }
+
+/* HISTORY VIEW */
+.db-top { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.db-search {
+  flex: 1; padding: 9px 14px;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 14px; font-family: inherit;
+  background: var(--surface); color: var(--text);
+}
+.db-search:focus { outline: none; border-color: var(--accent); }
+.db-count { font-size: 13px; color: var(--text3); white-space: nowrap; }
+.db-empty {
+  text-align: center; padding: 60px 20px;
+  color: var(--text3); font-size: 14px;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-lg);
+}
+.db-empty-icon { font-size: 36px; margin-bottom: 12px; opacity: .4; }
+.db-list { display: flex; flex-direction: column; gap: 12px; }
+.db-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.db-card-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px; cursor: pointer;
+  transition: background .15s;
+}
+.db-card-head:hover { background: var(--surface2); }
+.db-kw { font-weight: 500; font-size: 15px; flex: 1; }
+.db-date { font-size: 12px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.db-step-dots { display: flex; gap: 4px; }
+.db-dot {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  background: var(--surface2); color: var(--text3);
+}
+.db-dot.filled { background: var(--green-bg); color: var(--green); }
+.db-card-body { display: none; border-top: 1px solid var(--border); padding: 16px 18px; }
+.db-card-body.open { display: block; }
+.db-section { margin-bottom: 14px; }
+.db-sec-title { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+.db-content {
+  font-size: 12px; line-height: 1.6; color: var(--text);
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 120px; overflow-y: auto;
+  padding: 8px 10px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-family: inherit;
+}
+.db-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+/* STEP 0 COMPETITOR BLOCKS */
+.comp-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: var(--bg);
+  position: relative;
+  transition: border-color .15s;
+}
+.comp-block:focus-within { border-color: var(--border-strong); }
+.comp-block-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.comp-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--surface2); color: var(--text2);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.comp-url {
+  flex: 1; padding: 6px 10px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 12px; font-family: 'DM Mono', monospace;
+  background: var(--surface); color: var(--text);
+}
+.comp-url:focus { outline: none; border-color: var(--accent); }
+.comp-url::placeholder { color: var(--text3); }
+.comp-remove {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text3); font-size: 14px; line-height: 1;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .15s;
+}
+.comp-remove:hover { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
+.comp-ta {
+  width: 100%; padding: 9px 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 13px; line-height: 1.75;
+  color: var(--text); background: var(--surface);
+  resize: vertical; min-height: 100px;
+  font-family: inherit;
+}
+.comp-ta:focus { outline: none; border-color: var(--accent); }
+.comp-ta::placeholder { color: var(--text3); }
+.add-comp-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 16px; margin-top: 4px;
+  border: 1.5px dashed var(--border); border-radius: var(--radius);
+  font-size: 13px; color: var(--text3);
+  background: transparent; cursor: pointer;
+  width: 100%; justify-content: center;
+  transition: all .15s; font-family: inherit;
+}
+.add-comp-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+.comp-summary {
+  margin-top: 12px; padding: 10px 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px; line-height: 1.7; color: var(--text2);
+  display: none;
+}
+.comp-summary.show { display: block; }
+
+/* PAGE TITLE */
+.page-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.page-sub { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
+
+/* SECTION SEP */
+.sep-label {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  letter-spacing: .08em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 10px;
+  margin: 16px 0 10px;
+}
+.sep-label::before, .sep-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--text); color: #fff;
+  padding: 10px 18px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,.2);
+  transform: translateY(20px); opacity: 0;
+  transition: all .3s;
+  pointer-events: none;
+  z-index: 999;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.green { background: var(--green); }
+.toast.red { background: var(--red); }
+
+/* TA EDITOR */
+.ta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+.ta-field { display: flex; flex-direction: column; gap: 5px; }
+.ta-field.full { grid-column: 1 / -1; }
+.ta-field-label {
+  font-size: 11px; font-weight: 700; color: var(--text2);
+  letter-spacing: .03em; display: flex; align-items: center; gap: 6px;
+}
+.ta-input {
+  padding: 8px 11px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 13px; font-family: inherit;
+  background: var(--surface); color: var(--text);
+  transition: border .15s;
+}
+.ta-input:focus { outline: none; border-color: var(--accent); }
+.ta-input::placeholder { color: var(--text3); }
+.ta-input.edited { border-color: var(--green-border); background: var(--green-bg); }
+textarea.ta-input { resize: vertical; min-height: 64px; line-height: 1.6; }
+.stdc-tip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 400; color: var(--text3);
+  cursor: help; position: relative;
+}
+.stdc-tip:hover .stdc-popup { display: block; }
+.stdc-popup {
+  display: none;
+  position: absolute; top: 20px; left: 0; z-index: 50;
+  background: var(--text); color: #fff;
+  border-radius: var(--radius); padding: 10px 13px;
+  font-size: 12px; line-height: 1.7; white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,.18);
+  pointer-events: none;
+}
+.ta-parse-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; margin-top: 10px;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-sm);
+  background: var(--accent-bg); color: var(--accent);
+  font-size: 13px; font-weight: 500; font-family: inherit;
+  cursor: pointer; transition: all .15s;
+}
+.ta-parse-btn:hover { background: #d4dffb; }
+.ta-section {
+  margin-top: 14px; padding: 14px 16px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.ta-section-title {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  letter-spacing: .07em; text-transform: uppercase; margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ta-confirm-badge {
+  font-size: 10px; padding: 2px 8px;
+  background: var(--green-bg); color: var(--green);
+  border-radius: 20px; font-weight: 500; display: none;
+}
+.ta-confirm-badge.show { display: inline-flex; }</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    SEO 大綱生產系統
+  </div>
+  <div class="header-tabs">
+    <button class="htab active" onclick="switchMain('workflow')">流程作業</button>
+    <button class="htab" onclick="switchMain('history')">歷史記錄</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="kw-section">
+      <div class="kw-label">目標關鍵字</div>
+      <div class="kw-input-wrap">
+        <input class="kw-input" id="kwInput" type="text" placeholder="例如：眼袋手術" onkeydown="if(event.key==='Enter')applyKw()" />
+        <button class="kw-apply" onclick="applyKw()">套用關鍵字</button>
+      </div>
+      <div class="kw-badge" id="kwBadge"></div>
+    </div>
+
+    <div class="nav-label">作業步驟</div>
+    <div class="nav-item active" id="navBiz" onclick="scrollToCard('biz')">
+      <div class="nav-num" id="nnBiz" style="background:#fde8d7;color:#8a4a00">B</div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">前置設定</div>
+        客戶產業 / CTA 方向
+      </div>
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav0" onclick="scrollToCard(0)">
+      <div class="nav-num" id="nn0" style="background:#f0ebe3;color:#7a6a5a">0</div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">手動輸入</div>
+        SERP 競品大綱
+      </div>
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav1" onclick="scrollToCard(1)">
+      <div class="nav-num n1" id="nn1">1</div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Perplexity</div>
+        意圖分析 + PAA
+      </div>
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav2" onclick="scrollTo2()">
+      <div class="nav-num n2" id="nn2">2</div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">ChatGPT</div>
+        生成初步大綱
+      </div>
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav3" onclick="scrollTo3()">
+      <div class="nav-num n3" id="nn3">3</div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Gemini</div>
+        審查與優化
+      </div>
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav4" onclick="scrollTo4()">
+      <div class="nav-num n4" id="nn4">4</div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">NotebookLM</div>
+        來源對照
+      </div>
+      <span class="check">✓</span>
+    </div>
+    <div class="nav-item" id="nav5" onclick="scrollTo5()">
+      <div class="nav-num n5" id="nn5">5</div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">最終輸出</div>
+        整合大綱
+      </div>
+      <span class="check">✓</span>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="prog-label">完成進度</div>
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="prog-text" id="progText">0 / 6 步驟完成</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- WORKFLOW VIEW -->
+    <div id="view-workflow" class="view active">
+      <div class="page-title">SEO 大綱生產流程</div>
+      <div class="page-sub">依序完成六個步驟，最終輸出符合格式規範的大綱</div>
+
+      <!-- STEP BIZ: 客戶產業 / 服務 / CTA 方向設定 -->
+      <div class="step-card" id="cardBiz">
+        <div class="step-header" onclick="togCard('biz')">
+          <div class="step-badge" style="background:#fde8d7;color:#8a4a00">B</div>
+          <div class="step-info">
+            <div class="step-tool">前置設定（最重要）</div>
+            <div class="step-title">客戶產業 / 主推服務 / CTA 導流方向</div>
+          </div>
+          <div class="step-toggle open" id="togBiz">▾</div>
+        </div>
+        <div class="step-body open" id="bodyBiz">
+          <div class="notice red" style="margin-bottom:14px">
+            <strong>為什麼要先設定客戶輪廓？</strong><br>
+            同一組關鍵字在不同業別下，大綱方向、競品挑選、CTA 導流都完全不同。<br>
+            例：「<strong>管理費</strong>」這個詞若客戶是：<br>
+            ・<strong>不動產律師</strong> → 方向應為「管理費糾紛、催收、訴訟」，CTA 導向律師諮詢<br>
+            ・<strong>社區管理顧問公司</strong> → 方向為「管理費試算、代收服務」，CTA 導向代管服務<br>
+            ・<strong>社區 App 廠商</strong> → 方向為「數位化收費、帳務透明」，CTA 導向 App 下載<br>
+            若未先設定，AI 會挑最熱門（通常非你客戶）的方向，整份大綱會歪掉。
+          </div>
+
+          <div class="ta-section" style="display:block;background:var(--surface2);border-color:var(--border-strong)">
+            <div class="ta-section-title" style="color:var(--text)">
+              客戶業別設定
+              <span class="ta-confirm-badge" id="bizConfirmBadge">已設定 ✓</span>
+            </div>
+            <div class="ta-grid">
+
+              <div class="ta-field full">
+                <div class="ta-field-label">客戶產業 / 類型 <span style="color:var(--red)">*必填</span></div>
+                <input class="ta-input" id="biz_industry" type="text" placeholder="例如：不動產律師事務所 / 醫美診所 / 社區管理顧問 / SaaS 軟體廠商" oninput="onBizChange(this)" />
+              </div>
+
+              <div class="ta-field full">
+                <div class="ta-field-label">主推服務 / 產品 <span style="color:var(--red)">*必填</span></div>
+                <textarea class="ta-input" id="biz_service" placeholder="例如：管理費催收訴訟代理、區分所有權人會議法律顧問、公寓大廈糾紛調解" oninput="onBizChange(this)"></textarea>
+              </div>
+
+              <div class="ta-field full">
+                <div class="ta-field-label">
+                  預期 CTA 導流方向 <span style="color:var(--red)">*必填</span>
+                  <span class="stdc-tip">ⓘ 說明
+                    <div class="stdc-popup">
+                      決定文章最後 CTA 段落要引導讀者做什麼，所有段落的語氣、切角都會朝這個方向收斂。<br><br>
+                      <strong>常見類型：</strong><br>
+                      ・預約專業諮詢（律師、醫師、顧問）<br>
+                      ・索取報價 / 估價<br>
+                      ・下載 App / 註冊試用<br>
+                      ・購買商品 / 加入會員<br>
+                      ・留下聯絡資料由業務跟進
+                    </div>
+                  </span>
+                </div>
+                <input class="ta-input" id="biz_cta" type="text" placeholder="例如：預約律師免費諮詢、留資由律師主動聯絡" oninput="onBizChange(this)" />
+              </div>
+
+              <div class="ta-field full">
+                <div class="ta-field-label">
+                  ⚠ 禁止的偏離方向 <span style="font-weight:400;color:var(--text3)">（非常重要）</span>
+                </div>
+                <textarea class="ta-input" id="biz_avoid" placeholder="列出 SERP 雖熱門、但與客戶業務無關、不可帶入的方向。例如：社區管理 App 介紹、物業管理系統評比、個人記帳技巧" oninput="onBizChange(this)"></textarea>
+              </div>
+
+              <div class="ta-field full">
+                <div class="ta-field-label">參考同業 / 競品方向提示 <span style="font-weight:400;color:var(--text3)">（選填，但強烈建議）</span></div>
+                <textarea class="ta-input" id="biz_peer" placeholder="提示 Perplexity / 自己挑競品時該找誰。例如：優先參考律師事務所、法律白話文運動、法律部落格；避開 PMS 軟體廠商、房仲自媒體" oninput="onBizChange(this)"></textarea>
+              </div>
+
+            </div>
+            <p style="font-size:12px;color:var(--text2);margin-top:12px;line-height:1.7">
+              ✅ 本設定會自動注入 Step 1 / 2 / 3 / 5 的 Prompt，確保 AI 從第一步就鎖定在客戶業別內。<br>
+              ✅ Step 0 挑競品時請依「參考同業方向」主動過濾，不要因為 SERP 排名高就放入無關業別。
+            </p>
+          </div>
+
+          <div class="save-row" style="margin-top:14px">
+            <button class="btn btn-green" onclick="saveStep('biz')">儲存客戶設定</button>
+            <span class="saved-flash" id="sfBiz">已儲存 ✓</span>
+          </div>
+          <p class="hint" style="margin-top:8px">完成後展開 Step 0，依「參考同業方向」挑選 3–5 篇最具參考價值的<strong>同業</strong>競品貼入</p>
+        </div>
+      </div>
+
+      <!-- STEP 0 -->
+      <div class="step-card" id="card0">
+        <div class="step-header" onclick="togCard(0)">
+          <div class="step-badge" style="background:#f0ebe3;color:#7a6a5a">0</div>
+          <div class="step-info">
+            <div class="step-tool">手動輸入</div>
+            <div class="step-title">貼入 SERP 前 3–5 名競品的 H2 大綱</div>
+          </div>
+          <div class="step-toggle open" id="tog0">▾</div>
+        </div>
+        <div class="step-body open" id="body0">
+          <div class="notice amber" style="margin-bottom:14px">
+            <strong>為什麼要手動貼？</strong><br>
+            Perplexity 有時無法完整抓取競品頁面的 H2 結構。本步驟請你親自開啟 SERP 前 3–5 篇最具參考價值的競品文章，將其 H2 大綱整理後貼入，不需全部 10 篇。格式不限，直接貼即可，系統會自動標記分隔。<br>
+            <strong style="color:var(--red)">⚠ 請先到上方「客戶產業 / CTA 方向」區塊填寫設定</strong>，並依照「參考同業方向」主動過濾競品，避免挑到無關業別的文章。
+          </div>
+          <div id="compBlocks"></div>
+          <button class="add-comp-btn" onclick="addComp()" id="addCompBtn">＋ 新增競品文章</button>
+          <div class="comp-summary" id="compSummary"></div>
+          <div class="save-row" style="margin-top:14px">
+            <button class="btn btn-green" onclick="saveStep(0)">儲存 Step 0</button>
+            <span class="saved-flash" id="sf0">已儲存 ✓</span>
+          </div>
+          <p class="hint" style="margin-top:8px">完成後展開 Step 1，讓 Perplexity 補充搜尋意圖分類與 PAA 問題</p>
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="step-card" id="card1">
+        <div class="step-header" onclick="togCard(1)">
+          <div class="step-badge n1">1</div>
+          <div class="step-info">
+            <div class="step-tool">Perplexity AI</div>
+            <div class="step-title">TA 受眾輪廓推測 + 搜尋意圖 + PAA 擷取</div>
+          </div>
+          <div class="step-toggle" id="tog1">▾</div>
+        </div>
+        <div class="step-body" id="body1">
+          <a class="tool-link" href="https://www.perplexity.ai/" target="_blank">🔗 開啟 Perplexity AI</a>
+          <div class="notice amber" style="margin-bottom:14px">
+            <strong>Step 1 聚焦四件事：</strong>TA 受眾輪廓推測、搜尋意圖分類、PAA 常見問題原文擷取、共通術語整理。H2 大綱結構已在 Step 0 手動輸入，Perplexity 不需重複處理。
+          </div>
+
+          <div class="field-label">Prompt <span>複製後貼入 Perplexity</span></div>
+          <div class="prompt-wrap">
+            <textarea class="prompt-ta" id="prompt1" readonly></textarea>
+            <button class="copy-btn" onclick="cp(1)">複製</button>
+          </div>
+
+          <div class="field-label" style="margin-top:16px">Perplexity 回覆結果 <span>貼入後點「解析並填入 TA 欄位」</span></div>
+          <textarea class="result-ta" id="r1" placeholder="貼上 Perplexity 的完整回覆結果..." oninput="onChange()" style="min-height:100px"></textarea>
+          <button class="ta-parse-btn" onclick="parseAndFillTA()">✦ 解析並填入 TA 欄位</button>
+
+          <!-- TA EDITOR -->
+          <div class="ta-section" id="taSection">
+            <div class="ta-section-title">
+              TA 受眾設定
+              <span class="ta-confirm-badge" id="taConfirmBadge">已確認 ✓</span>
+            </div>
+            <div class="ta-grid">
+
+              <div class="ta-field">
+                <div class="ta-field-label">TA 年齡</div>
+                <input class="ta-input" id="ta_age" type="text" placeholder="例如：30–45 歲" oninput="onTAChange(this)" />
+              </div>
+
+              <div class="ta-field">
+                <div class="ta-field-label">TA 月收入範圍</div>
+                <input class="ta-input" id="ta_income" type="text" placeholder="例如：5–10 萬元" oninput="onTAChange(this)" />
+              </div>
+
+              <div class="ta-field">
+                <div class="ta-field-label">TA 職業類別</div>
+                <input class="ta-input" id="ta_job" type="text" placeholder="例如：上班族、自由工作者" oninput="onTAChange(this)" />
+              </div>
+
+              <div class="ta-field">
+                <div class="ta-field-label">
+                  TA 目前在哪個階段
+                  <span class="stdc-tip">ⓘ 說明
+                    <div class="stdc-popup">
+                      <strong>See</strong>：尚未有需求，只是瀏覽資訊<br>
+                      <strong>Think</strong>：開始比較考慮中，評估選項<br>
+                      <strong>Do</strong>：準備採取行動，尋找具體方案<br>
+                      <strong>Care</strong>：已是客戶，需要售後維繫
+                    </div>
+                  </span>
+                </div>
+                <input class="ta-input" id="ta_stdc" type="text" placeholder="例如：Think → Do" oninput="onTAChange(this)" />
+              </div>
+
+              <div class="ta-field full">
+                <div class="ta-field-label">TA 搜尋時機</div>
+                <input class="ta-input" id="ta_timing" type="text" placeholder="例如：發現眼袋明顯後開始查詢、換季前計畫保養" oninput="onTAChange(this)" />
+              </div>
+
+              <div class="ta-field full">
+                <div class="ta-field-label">TA 可能遇到什麼問題來搜尋這個字？</div>
+                <textarea class="ta-input" id="ta_pain" placeholder="例如：睡眠充足但黑眼圈眼袋仍明顯、想改善但不確定手術或保養哪個適合" oninput="onTAChange(this)"></textarea>
+              </div>
+
+              <div class="ta-field full">
+                <div class="ta-field-label">TA 感到興趣的內容</div>
+                <textarea class="ta-input" id="ta_interest" placeholder="例如：手術前後對比、恢復期時間、費用透明度、醫生資歷" oninput="onTAChange(this)"></textarea>
+              </div>
+
+            </div>
+            <p style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">AI 推測值僅供參考，請根據客戶實際資訊修正後再進行下一步。欄位有改動時邊框會變綠色提示。</p>
+          </div>
+
+          <div class="save-row" style="margin-top:14px">
+            <button class="btn btn-green" onclick="saveStep(1)">儲存 Step 1</button>
+            <span class="saved-flash" id="sf1">已儲存 ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-card" id="card2">
+        <div class="step-header" onclick="togCard(2)">
+          <div class="step-badge n2">2</div>
+          <div class="step-info">
+            <div class="step-tool">ChatGPT</div>
+            <div class="step-title">依格式規範生成初步大綱（含★紅字確認提醒）</div>
+          </div>
+          <div class="step-toggle" id="tog2">▾</div>
+        </div>
+        <div class="step-body" id="body2">
+          <a class="tool-link" href="https://chatgpt.com/" target="_blank">🔗 開啟 ChatGPT</a>
+
+          <div class="sep-label">大綱格式規範預覽</div>
+          <div class="format-preview">
+            <div class="fp-h2">1. 什麼是眼袋手術？去眼袋手術的原理與對象評估</div>
+            <div class="fp-eg">eg：常見眼袋形成原因，區分遺傳型（脂肪膨出）與老化型（皮膚鬆弛）</div>
+            <div class="fp-eg">eg：誰適合做眼袋手術？不同年齡層的考量重點</div>
+            <div class="fp-red">★ 請客戶協助確認補充：以上眼袋成因是否需要補充調整</div>
+            <div class="fp-h2" style="margin-top:8px">2. 開眼袋怎麼選？內開與外開眼袋手術比較</div>
+            <div class="fp-h3">- 內開眼袋手術：從內側處理脂肪（<span class="fp-link">參考</span>）</div>
+            <div class="fp-h3">- 外開眼袋手術：修飾多餘鬆弛皮膚（<span class="fp-link">參考</span>）</div>
+            <div class="fp-red">★ 請客戶協助確認補充：以上比較內容是否符合診所實際做法</div>
+            <div class="fp-h2" style="margin-top:8px">FAQ 常見問題（取自 SERP PAA）</div>
+            <div class="fp-h3">- Q：做完開眼袋會不會很腫？多久能看起來自然？</div>
+            <div class="fp-h3">- Q：眼袋手術會留疤嗎？</div>
+            <div class="fp-red">★ 請客戶確認：診間第一線常被問到哪些問題</div>
+          </div>
+
+          <div class="field-label">Prompt <span>複製後貼入 ChatGPT</span></div>
+          <div class="prompt-wrap">
+            <textarea class="prompt-ta" id="prompt2" readonly style="min-height:240px"></textarea>
+            <button class="copy-btn" onclick="cp(2)">複製</button>
+          </div>
+          <div class="notice red" style="margin-top:12px">
+            <strong>格式核心規則（必須遵守）：</strong><br>
+            H2 後僅寫本段重點方向；H3/列點只能放 SERP 前10名<strong>共通出現</strong>的專有名詞（禁止 AI 增補）；每個 H2 下方必附★紅字確認提醒；FAQ 問題<strong>只能</strong>來自 PAA 或「其他人也搜尋了」，原文照錄
+          </div>
+          <div class="field-label">回覆結果 <span>將 ChatGPT 產出的初步大綱貼在下方</span></div>
+          <textarea class="result-ta" id="r2" placeholder="貼上 ChatGPT 的初步大綱..." oninput="onChange()"></textarea>
+          <div class="save-row">
+            <button class="btn btn-green" onclick="saveStep(2)">儲存 Step 2</button>
+            <span class="saved-flash" id="sf2">已儲存 ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-card" id="card3">
+        <div class="step-header" onclick="togCard(3)">
+          <div class="step-badge n3">3</div>
+          <div class="step-info">
+            <div class="step-tool">Gemini</div>
+            <div class="step-title">格式合規審查 + AI 幻覺名詞檢查 + 結構優化</div>
+          </div>
+          <div class="step-toggle" id="tog3">▾</div>
+        </div>
+        <div class="step-body" id="body3">
+          <a class="tool-link" href="https://gemini.google.com/" target="_blank">🔗 開啟 Gemini</a>
+          <div class="notice amber">
+            <strong>Gemini 四項審查重點：</strong><br>
+            ① AI幻覺名詞檢查（最重要）→ 標記未見於SERP的詞彙<br>
+            ② 確認每H2下有★紅字確認提醒<br>
+            ③ FAQ問題確認來自PAA，非 AI 自創<br>
+            ④ 段落結構：合併 / 刪除 / 順序調整 / 內容缺口補充
+          </div>
+          <div class="field-label">Prompt <span>複製後貼入 Gemini</span></div>
+          <div class="prompt-wrap">
+            <textarea class="prompt-ta" id="prompt3" readonly style="min-height:240px"></textarea>
+            <button class="copy-btn" onclick="cp(3)">複製</button>
+          </div>
+          <div class="field-label">回覆結果 <span>將 Gemini 優化後的大綱貼在下方</span></div>
+          <textarea class="result-ta" id="r3" placeholder="貼上 Gemini 優化後的完整大綱..." oninput="onChange()"></textarea>
+          <div class="save-row">
+            <button class="btn btn-green" onclick="saveStep(3)">儲存 Step 3</button>
+            <span class="saved-flash" id="sf3">已儲存 ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step-card" id="card4">
+        <div class="step-header" onclick="togCard(4)">
+          <div class="step-badge n4">4</div>
+          <div class="step-info">
+            <div class="step-tool">NotebookLM</div>
+            <div class="step-title">對照每段大綱的 SERP 來源出處</div>
+          </div>
+          <div class="step-toggle" id="tog4">▾</div>
+        </div>
+        <div class="step-body" id="body4">
+          <a class="tool-link" href="https://notebooklm.google.com/" target="_blank">🔗 開啟 NotebookLM</a>
+          <p style="font-size:13px;color:var(--text2);margin:8px 0 14px;line-height:1.7">先以關鍵字 <strong id="kwHint4" style="color:var(--text)">（請先套用關鍵字）</strong> 在 NotebookLM 上傳 SERP 前10名的參考來源文章，再使用以下 Prompt：</p>
+          <div class="field-label">Prompt <span>複製後貼入 NotebookLM</span></div>
+          <div class="prompt-wrap">
+            <textarea class="prompt-ta" id="prompt4" readonly style="min-height:180px"></textarea>
+            <button class="copy-btn" onclick="cp(4)">複製</button>
+          </div>
+          <div class="field-label">回覆結果 <span>將 NotebookLM 的來源對照結果貼在下方</span></div>
+          <textarea class="result-ta" id="r4" placeholder="貼上 NotebookLM 的來源對照結果..." oninput="onChange()"></textarea>
+          <div class="save-row">
+            <button class="btn btn-green" onclick="saveStep(4)">儲存 Step 4</button>
+            <span class="saved-flash" id="sf4">已儲存 ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step-card" id="card5">
+        <div class="step-header" onclick="togCard(5)">
+          <div class="step-badge n5">5</div>
+          <div class="step-info">
+            <div class="step-tool">最終整合輸出</div>
+            <div class="step-title">整合 Gemini + NotebookLM，產出附超連結的最終大綱</div>
+          </div>
+          <div class="step-toggle" id="tog5">▾</div>
+        </div>
+        <div class="step-body" id="body5">
+          <div class="step5-merge">
+            <div class="merge-note">
+              此步驟將 <strong>Step 3（Gemini 優化大綱）</strong> 與 <strong>Step 4（NotebookLM 來源對照）</strong> 整合，輸出格式參照蒔現美大綱樣式：黑字為段落架構，<span style="color:var(--red)">★紅字</span>為客戶確認提醒，列點後附 <span style="color:var(--accent)">超連結</span>。
+            </div>
+
+            <div class="sep-label">最終格式規範</div>
+            <div class="format-preview" style="margin-bottom:14px">
+              <div class="fp-h2">1. H2 標題（含關鍵字）</div>
+              <div class="fp-h3">- 列點名稱：SERP共通內容（<span class="fp-link">參考</span>、<span class="fp-link">參考</span>）</div>
+              <div class="fp-eg">eg：補充說明方向（<span class="fp-link">參考</span>）</div>
+              <div class="fp-red">★ 請客戶協助確認補充：具體確認事項</div>
+              <div class="fp-red">★ 建議搭配：圖示或延伸連結說明</div>
+            </div>
+
+            <div class="field-label">Step 5 Prompt <span>複製後貼入 Claude / ChatGPT</span></div>
+            <div class="prompt-wrap">
+              <textarea class="prompt-ta" id="prompt5" readonly style="min-height:200px"></textarea>
+              <button class="copy-btn" onclick="cp(5)">複製</button>
+            </div>
+          </div>
+
+          <div class="sep-label">最終大綱輸出</div>
+
+          <div style="background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:10px;font-size:12.5px;color:var(--amber);line-height:1.7">
+            <strong>貼入方式說明：</strong>從 AI 工具複製最終大綱後，直接貼入下方編輯區（Ctrl+V / ⌘V）。系統會自動保留超連結與★紅字格式。完成後點「📋 複製富文本」，再到 Google 文件貼上（Ctrl+V）即可，格式完全對齊。
+          </div>
+
+          <div id="r5editor"
+            contenteditable="true"
+            oninput="onEditorChange()"
+            style="
+              min-height:220px;
+              padding:14px 16px;
+              border:1.5px dashed var(--border);
+              border-radius:var(--radius);
+              font-size:13.5px;
+              line-height:1.9;
+              color:var(--text);
+              background:var(--surface);
+              outline:none;
+              font-family:'Noto Sans TC',sans-serif;
+              word-break:break-word;
+              transition:border .15s;
+            "
+            onfocus="this.style.borderStyle='solid';this.style.borderColor='var(--accent)'"
+            onblur="this.style.borderStyle='dashed';this.style.borderColor='var(--border)'"
+          ><span style="color:var(--text3);font-style:italic">將 AI 整合後的最終大綱貼在這裡⋯⋯支援超連結與紅字格式</span></div>
+
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="btn" style="background:var(--accent);color:#fff;border-color:var(--accent);font-size:13px;padding:8px 18px" onclick="copyRichText()">📋 複製富文本 → 貼入 Google 文件</button>
+            <button class="btn btn-ghost" onclick="clearEditor()" style="font-size:12px">清除編輯區</button>
+            <span id="richCopyFlash" style="font-size:12px;color:var(--green);opacity:0;transition:opacity .3s">已複製！請到 Google 文件貼上 ✓</span>
+          </div>
+
+          <div class="save-row" style="margin-top:16px;flex-wrap:wrap;gap:10px;padding-top:14px;border-top:1px solid var(--border)">
+            <button class="btn btn-green" onclick="saveAll()" style="font-size:14px;padding:10px 22px">💾 儲存完整專案到資料庫</button>
+            <button class="btn btn-blue" onclick="exportTxt()">📄 匯出純文字</button>
+            <button class="btn btn-ghost" onclick="clearAll()">清除本頁所有資料</button>
+          </div>
+          <p style="font-size:12px;color:var(--text3);margin-top:8px">儲存後可在上方「歷史記錄」分頁查找所有步驟內容</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY VIEW -->
+    <div id="view-history" class="view">
+      <div class="page-title">歷史記錄</div>
+      <div class="page-sub">查找過往所有關鍵字專案的完整大綱記錄</div>
+      <div class="db-top">
+        <input class="db-search" type="text" id="dbSearch" placeholder="搜尋關鍵字..." oninput="renderDB()" />
+        <span class="db-count" id="dbCount"></span>
+        <button class="btn btn-ghost" onclick="renderDB()">重新整理</button>
+      </div>
+      <div id="dbList" class="db-list"></div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'seo_projects_v1';
+let kw = '';
+let openCards = new Set([0]);
+
+// ── STEP 0: COMPETITOR BLOCKS ──
+let compCount = 0;
+
+function getCompData() {
+  const result = [];
+  document.querySelectorAll('.comp-block').forEach((b, i) => {
+    const url = b.querySelector('.comp-url').value.trim();
+    const content = b.querySelector('.comp-ta').value.trim();
+    if (content) result.push({ index: i + 1, url, content });
+  });
+  return result;
+}
+
+function getCompText() {
+  const data = getCompData();
+  if (!data.length) return '';
+  return data.map(d =>
+    `【競品第 ${d.index} 篇】${d.url ? '（' + d.url + '）' : ''}\n${d.content}`
+  ).join('\n\n');
+}
+
+function updateCompSummary() {
+  const data = getCompData();
+  const el = document.getElementById('compSummary');
+  if (!data.length) { el.classList.remove('show'); onChange(); return; }
+  el.classList.add('show');
+  el.innerHTML = `<strong style="color:var(--text)">已輸入 ${data.length} 篇競品大綱</strong>，將與 Step 1 的 Perplexity 分析結果合併作為後續步驟的資料來源。`;
+  onChange();
+}
+
+function addComp() {
+  const container = document.getElementById('compBlocks');
+  const existing = container.querySelectorAll('.comp-block').length;
+  if (existing >= 5) { showToast('最多輸入 5 篇競品文章', 'red'); return; }
+  compCount++;
+  const idx = existing + 1;
+  const div = document.createElement('div');
+  div.className = 'comp-block';
+  div.dataset.id = compCount;
+  div.innerHTML = `
+    <div class="comp-block-header">
+      <div class="comp-num">${idx}</div>
+      <input class="comp-url" type="url" placeholder="競品文章網址（選填）" />
+      <button class="comp-remove" onclick="removeComp(this)" title="移除此篇">×</button>
+    </div>
+    <textarea class="comp-ta" placeholder="貼入此篇文章的 H2 大綱內容，格式不限。例如：
+H2：什麼是眼袋手術？
+H2：內開 vs 外開眼袋手術比較
+H2：眼袋手術恢復期要多久？" oninput="updateCompSummary()"></textarea>`;
+  container.appendChild(div);
+  renumberComps();
+  updateAddBtn();
+  div.querySelector('.comp-ta').focus();
+}
+
+function removeComp(btn) {
+  btn.closest('.comp-block').remove();
+  renumberComps();
+  updateAddBtn();
+  updateCompSummary();
+}
+
+function renumberComps() {
+  document.querySelectorAll('.comp-block').forEach((b, i) => {
+    b.querySelector('.comp-num').textContent = i + 1;
+  });
+}
+
+function updateAddBtn() {
+  const count = document.querySelectorAll('.comp-block').length;
+  const btn = document.getElementById('addCompBtn');
+  if (btn) btn.style.display = count >= 5 ? 'none' : 'flex';
+}
+
+function loadCompData(dataArr) {
+  const container = document.getElementById('compBlocks');
+  container.innerHTML = '';
+  compCount = 0;
+  (dataArr || []).forEach((d, i) => {
+    compCount++;
+    const div = document.createElement('div');
+    div.className = 'comp-block';
+    div.dataset.id = compCount;
+    const safeUrl = (d.url || '').replace(/"/g, '&quot;');
+    const safeContent = (d.content || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    div.innerHTML = `
+      <div class="comp-block-header">
+        <div class="comp-num">${i + 1}</div>
+        <input class="comp-url" type="url" placeholder="競品文章網址（選填）" value="${safeUrl}" />
+        <button class="comp-remove" onclick="removeComp(this)" title="移除此篇">×</button>
+      </div>
+      <textarea class="comp-ta" placeholder="貼入此篇文章的 H2 大綱內容..." oninput="updateCompSummary()">${safeContent}</textarea>`;
+    container.appendChild(div);
+  });
+  renumberComps();
+  updateAddBtn();
+  updateCompSummary();
+}
+
+// ── TA: TARGET AUDIENCE EDITOR ──
+const TA_FIELDS = ['ta_age','ta_income','ta_job','ta_stdc','ta_timing','ta_pain','ta_interest'];
+const TA_LABELS = {
+  ta_age:      'TA 年齡',
+  ta_income:   'TA 月收入範圍',
+  ta_job:      'TA 職業類別',
+  ta_stdc:     'TA 目前所在階段（See / Think / Do / Care）',
+  ta_timing:   'TA 搜尋時機',
+  ta_pain:     'TA 可能遇到什麼問題所以來搜尋這個字',
+  ta_interest: 'TA 感到興趣的內容',
+};
+
+// ── BIZ: 客戶產業 / 服務 / CTA 方向 ──
+const BIZ_FIELDS = ['biz_industry','biz_service','biz_cta','biz_avoid','biz_peer'];
+const BIZ_LABELS = {
+  biz_industry: '客戶產業 / 類型',
+  biz_service:  '主推服務 / 產品',
+  biz_cta:      '預期 CTA 導流方向',
+  biz_avoid:    '禁止的偏離方向（negative scope）',
+  biz_peer:     '參考同業 / 競品方向提示',
+};
+
+function getBizData() {
+  const obj = {};
+  BIZ_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    obj[id] = el ? el.value.trim() : '';
+  });
+  return obj;
+}
+
+function getBizText() {
+  const d = getBizData();
+  return BIZ_FIELDS
+    .filter(id => d[id])
+    .map(id => `${BIZ_LABELS[id]}：${d[id]}`)
+    .join('\n');
+}
+
+function setBizData(obj) {
+  if (!obj) return;
+  BIZ_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && obj[id]) { el.value = obj[id]; el.classList.remove('edited'); }
+  });
+  updateBizConfirmBadge();
+}
+
+function onBizChange(el) {
+  el.classList.add('edited');
+  updateBizConfirmBadge();
+  updatePrompts();
+  updateNav();
+}
+
+function updateBizConfirmBadge() {
+  const d = getBizData();
+  // 必填三項至少全填才顯示已設定
+  const ready = d.biz_industry && d.biz_service && d.biz_cta;
+  const badge = document.getElementById('bizConfirmBadge');
+  if (badge) badge.classList.toggle('show', !!ready);
+}
+
+function clearBiz() {
+  BIZ_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('edited'); }
+  });
+  updateBizConfirmBadge();
+}
+
+function isBizReady() {
+  const d = getBizData();
+  return !!(d.biz_industry && d.biz_service && d.biz_cta);
+}
+
+function getTAData() {
+  const obj = {};
+  TA_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    obj[id] = el ? el.value.trim() : '';
+  });
+  return obj;
+}
+
+function getTAText() {
+  const d = getTAData();
+  return TA_FIELDS
+    .filter(id => d[id])
+    .map(id => `${TA_LABELS[id]}：${d[id]}`)
+    .join('\n');
+}
+
+function setTAData(obj) {
+  if (!obj) return;
+  TA_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && obj[id]) { el.value = obj[id]; el.classList.remove('edited'); }
+  });
+  updateTAConfirmBadge();
+}
+
+function onTAChange(el) {
+  el.classList.add('edited');
+  updateTAConfirmBadge();
+  updatePrompts();
+}
+
+function updateTAConfirmBadge() {
+  const d = getTAData();
+  const hasAny = TA_FIELDS.some(id => d[id]);
+  const badge = document.getElementById('taConfirmBadge');
+  if (badge) badge.classList.toggle('show', hasAny);
+}
+
+function parseAndFillTA() {
+  const raw = gv('r1');
+  if (!raw) { showToast('請先貼上 Perplexity 的回覆結果', 'red'); return; }
+
+  // Extract values by scanning for each label keyword
+  const patterns = {
+    ta_age:      /TA[^\n]*?年齡[^\n]*?[:：]\s*([^\n]+)/i,
+    ta_income:   /TA[^\n]*?月收入[^\n]*?[:：]\s*([^\n]+)/i,
+    ta_job:      /TA[^\n]*?職業[^\n]*?[:：]\s*([^\n]+)/i,
+    ta_stdc:     /TA[^\n]*?(See|Think|Do|Care|階段)[^\n]*?[:：]\s*([^\n]+)/i,
+    ta_timing:   /TA[^\n]*?搜尋時機[^\n]*?[:：]\s*([^\n]+)/i,
+    ta_pain:     /TA[^\n]*?問題[^\n]*?[:：]\s*([\s\S]*?)(?=\nTA|\n【|$)/i,
+    ta_interest: /TA[^\n]*?興趣[^\n]*?[:：]\s*([\s\S]*?)(?=\nTA|\n【|$)/i,
+  };
+
+  let filled = 0;
+  TA_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const m = raw.match(patterns[id]);
+    if (m) {
+      // stdc has a different capture group due to alternation
+      const val = (id === 'ta_stdc' ? m[2] : m[1] || m[2] || '').trim().replace(/\n+/g, '；');
+      if (val) { el.value = val; el.classList.remove('edited'); filled++; }
+    }
+  });
+
+  updateTAConfirmBadge();
+  updatePrompts();
+
+  if (filled > 0) {
+    showToast(`已解析並填入 ${filled} 個 TA 欄位，請核實後修正`, 'green');
+  } else {
+    showToast('未能自動解析，請手動填寫 TA 欄位', 'red');
+  }
+}
+
+function clearTA() {
+  TA_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('edited'); }
+  });
+  updateTAConfirmBadge();
+}
+
+// ── RICH TEXT EDITOR (Step 5) ──
+const PLACEHOLDER_HTML = '<span style="color:var(--text3);font-style:italic">將 AI 整合後的最終大綱貼在這裡⋯⋯支援超連結與紅字格式</span>';
+
+function getEditorHTML() {
+  const ed = document.getElementById('r5editor');
+  if (!ed) return '';
+  // If only placeholder, treat as empty
+  if (ed.innerHTML === PLACEHOLDER_HTML) return '';
+  return ed.innerHTML.trim();
+}
+function getEditorText() {
+  const ed = document.getElementById('r5editor');
+  if (!ed) return '';
+  if (ed.innerHTML === PLACEHOLDER_HTML) return '';
+  return ed.innerText.trim();
+}
+function setEditorHTML(html) {
+  const ed = document.getElementById('r5editor');
+  if (!ed) return;
+  ed.innerHTML = html || PLACEHOLDER_HTML;
+}
+
+function onEditorChange() {
+  const ed = document.getElementById('r5editor');
+  // Remove placeholder on first keystroke
+  if (ed && ed.innerHTML === PLACEHOLDER_HTML) ed.innerHTML = '';
+  updateNav();
+}
+
+function clearEditor() {
+  setEditorHTML('');
+  updateNav();
+}
+
+function copyRichText() {
+  const ed = document.getElementById('r5editor');
+  if (!ed || !getEditorHTML()) { showToast('編輯區尚無內容', 'red'); return; }
+
+  // Build clean HTML for clipboard — Google Docs friendly
+  const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;font-size:14px;line-height:1.8">${ed.innerHTML}</body></html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const textBlob = new Blob([ed.innerText], { type: 'text/plain' });
+
+  try {
+    const item = new ClipboardItem({ 'text/html': blob, 'text/plain': textBlob });
+    navigator.clipboard.write([item]).then(() => {
+      const flash = document.getElementById('richCopyFlash');
+      flash.style.opacity = '1';
+      setTimeout(() => flash.style.opacity = '0', 3000);
+      showToast('富文本已複製！請到 Google 文件貼上', 'green');
+    }).catch(() => fallbackCopyRich(ed));
+  } catch(e) {
+    fallbackCopyRich(ed);
+  }
+}
+
+function fallbackCopyRich(ed) {
+  // Selection-based fallback
+  const range = document.createRange();
+  range.selectNodeContents(ed);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  try {
+    document.execCommand('copy');
+    showToast('已複製（相容模式）！請到 Google 文件貼上', 'green');
+    const flash = document.getElementById('richCopyFlash');
+    if (flash) { flash.style.opacity = '1'; setTimeout(() => flash.style.opacity = '0', 3000); }
+  } catch(e) {
+    showToast('複製失敗，請手動 Ctrl+A 全選後複製', 'red');
+  }
+  sel.removeAllRanges();
+}
+
+
+function getProjects() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch { return []; }
+}
+function setProjects(list) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+  catch(e) { showToast('儲存失敗：' + e.message, 'red'); }
+}
+function findOrCreate(k) {
+  const list = getProjects();
+  let idx = list.findIndex(p => p.kw === k);
+  if (idx === -1) {
+    const proj = { kw: k, date: today(), steps: {}, final: '' };
+    list.unshift(proj);
+    setProjects(list);
+    return { list, proj, idx: 0 };
+  }
+  return { list, proj: list[idx], idx };
+}
+function today() { return new Date().toLocaleDateString('zh-TW', { year:'numeric', month:'2-digit', day:'2-digit' }); }
+
+// ── UI ──
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+function switchMain(view) {
+  document.querySelectorAll('.htab').forEach((el, i) => el.classList.toggle('active', ['workflow','history'][i] === view));
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  if (view === 'history') renderDB();
+}
+
+function togCard(n) {
+  // 支援 'biz' 特殊節點：對應 bodyBiz / togBiz
+  const suffix = (n === 'biz') ? 'Biz' : String(n);
+  const body = document.getElementById('body' + suffix);
+  const tog = document.getElementById('tog' + suffix);
+  if (!body || !tog) return;
+  if (body.classList.contains('open')) {
+    body.classList.remove('open'); tog.classList.remove('open');
+    openCards.delete(n);
+  } else {
+    body.classList.add('open'); tog.classList.add('open');
+    openCards.add(n);
+  }
+}
+
+function scrollToCard(n) {
+  const suffix = (n === 'biz') ? 'Biz' : String(n);
+  const el = document.getElementById('card' + suffix);
+  if (!el) return;
+  const body = document.getElementById('body' + suffix);
+  const tog = document.getElementById('tog' + suffix);
+  if (body && !body.classList.contains('open')) {
+    body.classList.add('open'); tog.classList.add('open'); openCards.add(n);
+  }
+  setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+}
+function scrollTo1() { scrollToCard(1); }
+function scrollTo2() { scrollToCard(2); }
+function scrollTo3() { scrollToCard(3); }
+function scrollTo4() { scrollToCard(4); }
+function scrollTo5() { scrollToCard(5); }
+
+function applyKw() {
+  const v = document.getElementById('kwInput').value.trim();
+  if (!v) { showToast('請輸入關鍵字組', 'red'); return; }
+  kw = v;
+  const badge = document.getElementById('kwBadge');
+  badge.textContent = kw; badge.style.display = 'block';
+  document.getElementById('kwHint4').textContent = kw;
+  updatePrompts(); updateNav();
+  showToast('關鍵字已套用：' + kw, 'green');
+}
+
+function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function onChange() { updatePrompts(); updateNav(); }
+
+function updateNav() {
+  const bizDone = isBizReady();
+  const step0done = getCompText().length > 0;
+  const vals = [bizDone ? 'x' : '', step0done ? 'x' : '', gv('r1'), gv('r2'), gv('r3'), gv('r4'), getEditorText()];
+  const navIds = ['navBiz','nav0','nav1','nav2','nav3','nav4','nav5'];
+  const nnIds  = ['nnBiz','nn0','nn1','nn2','nn3','nn4','nn5'];
+  let done = 0;
+  vals.forEach((v, i) => {
+    const nav = document.getElementById(navIds[i]);
+    const nn  = document.getElementById(nnIds[i]);
+    if (!nav || !nn) return;
+    if (v) {
+      done++;
+      nav.classList.add('done-step');
+      nn.classList.add('n-done');
+    } else {
+      nav.classList.remove('done-step');
+      nn.classList.remove('n-done');
+    }
+    if (i >= 2) {
+      const ta = document.getElementById('r' + (i - 1));
+      if (ta) ta.classList.toggle('filled', !!v);
+    }
+  });
+  const total = 7;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progText').textContent = done + ' / ' + total + ' 步驟完成';
+}
+
+function cp(n) {
+  const el = document.getElementById('prompt' + n);
+  if (!el.value) { showToast('Prompt 為空，請先套用關鍵字', 'red'); return; }
+  navigator.clipboard.writeText(el.value).then(() => {
+    const btn = el.parentNode.querySelector('.copy-btn');
+    btn.textContent = '已複製 ✓'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    el.select(); document.execCommand('copy');
+    showToast('已複製（舊版方式）', 'green');
+  });
+}
+
+function flash(n) {
+  const el = document.getElementById('sf' + n);
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function saveStep(n) {
+  if (!kw) { showToast('請先輸入並套用關鍵字', 'red'); return; }
+  if (n === 'biz') {
+    if (!isBizReady()) { showToast('請至少填寫「客戶產業」「主推服務」「CTA 方向」三個必填欄位', 'red'); return; }
+    const { list, proj, idx } = findOrCreate(kw);
+    proj.biz = getBizData();
+    proj.date = today();
+    list[idx] = proj;
+    setProjects(list);
+    flash('Biz');
+    showToast('客戶設定已儲存', 'green');
+    updateNav();
+    return;
+  }
+  if (n === 0) {
+    const data = getCompData();
+    if (!data.length) { showToast('請先輸入至少一篇競品大綱', 'red'); return; }
+    const { list, proj, idx } = findOrCreate(kw);
+    proj.comp = data;
+    proj.date = today();
+    list[idx] = proj;
+    setProjects(list);
+    flash(0);
+    showToast('Step 0 已儲存', 'green');
+    updateNav();
+    return;
+  }
+  if (n === 1) {
+    const val = gv('r1');
+    if (!val) { showToast('請先貼上 Perplexity 的回覆結果', 'red'); return; }
+    const { list, proj, idx } = findOrCreate(kw);
+    proj.steps[1] = val;
+    proj.ta = getTAData();
+    proj.date = today();
+    list[idx] = proj;
+    setProjects(list);
+    flash(1);
+    showToast('Step 1 已儲存（含 TA 設定）', 'green');
+    updateNav();
+    return;
+  }
+  const val = gv('r' + n);
+  if (!val) { showToast('請先填入 Step ' + n + ' 的結果', 'red'); return; }
+  const { list, proj, idx } = findOrCreate(kw);
+  proj.steps[n] = val;
+  proj.date = today();
+  list[idx] = proj;
+  setProjects(list);
+  flash(n);
+  showToast('Step ' + n + ' 已儲存', 'green');
+  updateNav();
+}
+
+function saveAll() {
+  if (!kw) { showToast('請先輸入並套用關鍵字', 'red'); return; }
+  const { list, proj, idx } = findOrCreate(kw);
+  let hasSomething = false;
+  const bizData = getBizData();
+  if (BIZ_FIELDS.some(id => bizData[id])) { proj.biz = bizData; hasSomething = true; }
+  const compData = getCompData();
+  if (compData.length) { proj.comp = compData; hasSomething = true; }
+  const taData = getTAData();
+  if (TA_FIELDS.some(id => taData[id])) { proj.ta = taData; hasSomething = true; }
+  for (let n = 1; n <= 4; n++) {
+    const v = gv('r' + n);
+    if (v) { proj.steps[n] = v; hasSomething = true; }
+  }
+  const f = getEditorHTML();
+  if (f) { proj.final = f; hasSomething = true; }
+  if (!hasSomething) { showToast('尚無任何內容可儲存', 'red'); return; }
+  proj.date = today();
+  list[idx] = proj;
+  setProjects(list);
+  showToast('完整專案已儲存：' + kw, 'green');
+  updateNav();
+}
+
+
+
+function clearAll() {
+  if (!confirm('確定要清除本頁所有填寫內容嗎？（不影響已儲存的資料庫記錄）')) return;
+  document.getElementById('compBlocks').innerHTML = '';
+  compCount = 0;
+  updateAddBtn();
+  document.getElementById('compSummary').classList.remove('show');
+  clearBiz();
+  clearTA();
+  ['r1','r2','r3','r4'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  setEditorHTML('');
+  updateNav(); updatePrompts();
+  showToast('已清除本頁資料');
+}
+
+
+// ── PROMPTS ──
+function updatePrompts() {
+  const kl = kw || '（關鍵字組）';
+  const r0 = getCompText();
+  const r1 = gv('r1'), r2 = gv('r2'), r3 = gv('r3'), r4 = gv('r4');
+  const taText = getTAText();
+  const bizData = getBizData();
+  const bizText = getBizText();
+
+  const r0block = r0
+    ? `【資料來源 A】手動整理的 SERP 競品 H2 大綱（Step 0）：\n${r0}`
+    : '（請先完成 Step 0，手動貼入競品大綱）';
+
+  const r1block = r1
+    ? `【資料來源 B】Perplexity 搜尋意圖分析與 PAA（Step 1）：\n${r1}`
+    : '（請先完成 Step 1 Perplexity 分析）';
+
+  const taBlock = taText
+    ? `【目標受眾（TA）設定】（已由人工確認）：\n${taText}`
+    : '（TA 設定尚未填寫，請完成 Step 1 的 TA 欄位）';
+
+  // 客戶業別設定區塊（會注入到所有 prompt）
+  const bizBlock = bizText
+    ? `【客戶業別設定】（人工設定，所有生成內容必須對齊此方向）：
+${bizText}
+
+⚠ 重要原則：
+1. 所有 H2 段落、列點、FAQ、CTA 的切角都必須與「客戶產業」和「主推服務」一致
+2. 即使 SERP 熱門結果偏向其他方向，也不得偏離客戶業別（例如律師客戶不得導向 App 介紹）
+3. CTA 段落必須明確導向上述「預期 CTA 導流方向」
+4. 若使用者在「禁止的偏離方向」明列了不可寫的內容，嚴格排除`
+    : '⚠【客戶業別設定尚未填寫】請先完成前置設定，否則大綱方向極易偏離客戶業務';
+
+  // 業別導向的精簡提示（給 Prompt 1 / 5 用）
+  const bizHint = bizData.biz_industry
+    ? `客戶為「${bizData.biz_industry}」，主推「${bizData.biz_service || '（未填）'}」，CTA 方向為「${bizData.biz_cta || '（未填）'}」`
+    : '（客戶業別尚未設定）';
+
+  const avoidHint = bizData.biz_avoid
+    ? `\n⚠ 禁止偏離方向：${bizData.biz_avoid}`
+    : '';
+
+  const peerHint = bizData.biz_peer
+    ? `\n✅ 建議優先參考的同業方向：${bizData.biz_peer}`
+    : '';
+
+  // ═══════════════════ Prompt 1 ═══════════════════
+  document.getElementById('prompt1').value =
+`請透過台灣地區 Google 的 SERP 頁面，搜尋「${kl}」，完成以下四項分析（H2 大綱由人工整理，本步驟不需重複抓取）。
+
+${bizBlock}
+
+━━ 分析任務 ━━
+
+【一】目標受眾（TA）輪廓推測
+根據搜尋「${kl}」且符合上述客戶業別的用戶行為與 SERP 結果，推測以下七個面向。
+⚠ TA 推測必須對齊「客戶產業」與「主推服務」——例如客戶是律師、主推訴訟代理，則 TA 應該是「正遭遇法律糾紛、考慮提告的當事人」，而不是「一般資訊查詢者」。
+
+請逐項以「TA 標籤：內容」格式輸出：
+TA 年齡：
+TA 月收入範圍：
+TA 職業類別：
+TA 目前在哪個階段（See / Think / Do / Care）：
+TA 搜尋時機：
+TA 可能遇到什麼問題所以來搜尋這個字：
+TA 感到興趣的內容：
+
+【二】搜尋意圖分類
+判斷「${kl}」在「客戶業別」視角下的搜尋意圖類型（資訊型／商業型／導航型／交易型），並說明判斷依據。
+若 SERP 多數結果偏離客戶業別，請特別指出「SERP 主流方向 vs 客戶應切入方向」的差異。
+
+【三】SERP 共通術語與關鍵詞整理
+瀏覽 SERP 前 10 名，優先篩選與客戶業別相關的結果，統整：
+- 專有名詞、術語、步驟名稱（原文照錄，至少 3 篇出現才列入）
+- 常見數據、時間範圍、比較維度
+- 特別標註：哪些術語與客戶業別最相關、哪些屬於偏離方向（可不採用）
+
+【四】PAA 常見問題與相關搜尋
+請原文照錄 SERP 上：
+- 「其他人也問了」(People Also Ask) 的完整問題清單
+- 「其他人也搜尋了以下項目」的關鍵字清單
+- 並標註：哪些問題最貼近客戶業別（高優先）、哪些偏離（可捨棄）${peerHint}${avoidHint}`;
+
+  // ═══════════════════ Prompt 2 ═══════════════════
+  document.getElementById('prompt2').value =
+`你是一位擅長辨識搜尋意圖的 SEO 文案撰寫者。請根據以下資料，為關鍵字「${kl}」生成 SEO 大綱，並嚴格遵守格式規則：
+
+${bizBlock}
+
+${taBlock}
+
+${r0block}
+
+${r1block}
+
+━━ 格式規則（必須完全遵守）━━
+
+【最高原則：業別對齊】
+- 所有 H2 / H3 / FAQ / CTA 必須對齊「客戶產業」與「主推服務」
+- 即使資料來源 A（競品）或 B（SERP）出現偏離方向，也應過濾後使用
+- 若「禁止的偏離方向」欄位有填寫，嚴格排除相關內容
+
+【H2 標題格式】
+- 數字編號 + 標題（自然含入關鍵字）
+- 優先參考「資料來源 A」中與客戶業別一致的競品 H2 主題方向
+- 若競品大綱多數偏離客戶業別，可參考「搜尋意圖」中的差異分析自行調整切角
+- 標題後以一句話說明本段寫作方向（需符合 TA 的閱讀需求與所在階段，並能為客戶 CTA 鋪陳）
+- 以 eg: 開頭補充 1–3 個具體方向（取自資料中實際出現、且與客戶業別相關的內容）
+
+【H3 / 列點格式】
+- 只能放資料中共通出現的專有名詞、步驟名稱、術語（原文照錄）
+- 禁止 AI 自行增補未見於以上資料的詞彙
+- 禁止引用與客戶業別無關的競品專有名詞（例：律師客戶不得放入特定 App 功能名稱）
+- 格式：- 名稱：簡短說明
+
+【★紅字確認提醒】（每個 H2 下方必附，非常重要！）
+★ 請客戶協助確認補充：（具體說明需客戶核實的事項）
+若有建議圖片或連結：★ 建議搭配：xxx
+
+【FAQ 常見問題段落】
+- 問題只能來自「資料來源 B」的 PAA 或「其他人也搜尋了」，原文照錄
+- 優先選用與客戶業別最貼近的問題，偏離方向的 PAA 可捨棄
+- 禁止 AI 自行創作問題
+
+【CTA 段落】（此段對齊客戶方向最重要！）
+- 必須明確引導讀者執行「預期 CTA 導流方向」所指定的行動
+- 語氣需銜接 TA 的痛點與興趣，自然帶入客戶主推服務
+- 禁止出現與客戶業務無關的 CTA（例：律師客戶不得出現「下載 App」）
+- 最後附：★ 再請客戶確認要導連到哪個頁面
+
+━━━━━━━━━━━━━━━━━━
+
+核心關鍵字：${kl}
+延伸關鍵字（LSI）：（請補充）
+客戶業別摘要：${bizHint}`;
+
+  // ═══════════════════ Prompt 3 ═══════════════════
+  document.getElementById('prompt3').value =
+`你是 SEO 內容策略顧問兼大綱格式審查員。請對以下大綱進行格式合規審查與結構優化：
+
+關鍵字：${kl}
+
+${bizBlock}
+
+${taBlock}
+
+${r0block}
+
+${r1block}
+
+待審查大綱：
+${r2 || '（Step 2 結果尚未填入）'}
+
+━━ 請依序完成以下五項審查 ━━
+
+【審查一：業別對齊檢查】（最最重要，優先於其他審查）
+逐段檢查 H2、H3、FAQ、CTA 是否偏離客戶業別：
+- 是否出現與「客戶產業 / 主推服務」無關的切角？
+- 是否觸犯「禁止的偏離方向」清單？
+- CTA 段落是否明確導向「預期 CTA 導流方向」？若不是，直接改寫為正確方向
+若發現偏離：
+- 問題段落：「xxx」
+- 處理建議：刪除 / 改寫為（符合客戶業別的切角）
+
+【審查二：AI 幻覺名詞檢查】
+逐一檢查每個 H3 / 列點，是否出現未見於以上兩份資料的專有名詞或術語。若有：
+- 問題項目：「xxx」
+- 處理建議：刪除 / 替換為（資料中實際出現的詞彙）
+
+【審查三：★紅字確認提醒檢查】
+確認每個 H2 下方都有「★ 請客戶協助確認補充」提醒。若缺少，補上合適內容。
+
+【審查四：FAQ 問題來源檢查】
+確認 FAQ 段落問題均來自 PAA 或相關搜尋原文，且與客戶業別相關。若有 AI 自創問題或偏離業別的問題，標記並替換。
+
+【審查五：結構優化建議】
+① 建議刪除的段落及原因（特別是偏離業別的段落）
+② 建議合併的段落及方式
+③ 建議調整順序的段落及理由（業別導向的內容應置前、最相關的段落應在 CTA 前）
+④ 內容缺口（同業競品常見、但本大綱缺少的主題方向）
+
+最後輸出：符合所有格式規則、且完全對齊客戶業別的完整優化大綱（直接輸出大綱本身，不要另附審查說明）`;
+
+  // ═══════════════════ Prompt 4 ═══════════════════
+  document.getElementById('prompt4').value =
+`我已上傳與關鍵字「${kl}」相關的 SERP 參考來源文章。客戶業別為「${bizData.biz_industry || '（未設定）'}」，主推「${bizData.biz_service || '（未設定）'}」。
+
+請逐段對照下方大綱，找出每個 H2 及其列點最對應的來源出處，格式如下：
+
+【段落名稱】
+- 來源文章：[文章標題]（附上原文網址）
+- 段落位置：[對應標題名稱或第幾節]
+- 關鍵依據：[一句話說明對應關係]
+- 業別相關度：[高 / 中 / 低]（是否與客戶業別方向一致）
+
+若某段落在所有來源中均未找到對應依據，請標記：
+⚠ 未找到 SERP 對應來源，建議重新確認此段落是否為 AI 生成
+
+若某段落找到的對應來源與客戶業別不符（例：律師客戶但對應到 App 廠商文章），請標記：
+⚠ 來源業別不符，建議改用同業來源或刪除此段落
+
+待比對大綱：
+${r3 || '（Step 3 結果尚未填入）'}`;
+
+  // ═══════════════════ Prompt 5 ═══════════════════
+  document.getElementById('prompt5').value =
+`你是一位 SEO 大綱整合編輯。請將以下兩份資料整合，輸出符合格式規範且完全對齊客戶業別的最終大綱：
+
+${bizBlock}
+
+━━ 輸出格式規範 ━━
+1. H2 標題用數字編號，標題後附一句說明本段寫作方向（需扣合客戶業別）
+2. H3/列點：- 名稱：簡短說明（附來源超連結，格式：[參考](URL)）
+3. eg: 開頭的補充說明，同樣附超連結
+4. 每個 H2 段落下方必附：★ 請客戶協助確認補充：（具體事項）
+5. 如有建議圖片或延伸連結：★ 建議搭配：xxx
+6. FAQ 段落每題下方附：★ 請客戶確認診間常見問題是否需調整
+7. CTA 段落必須明確導向「預期 CTA 導流方向」，最後：★ 再請客戶確認要導連到哪個頁面
+━━━━━━━━━━━━━━━━━━
+
+關鍵字：${kl}
+客戶業別摘要：${bizHint}
+
+【資料一】Gemini 優化後大綱（Step 3）：
+${r3 || '（Step 3 結果尚未填入）'}
+
+【資料二】NotebookLM 來源對照結果（Step 4）：
+${r4 || '（Step 4 結果尚未填入）'}
+
+━━ 整合要求 ━━
+1. 為每個列點補上對應的 [參考](URL) 超連結
+2. 確保所有★紅字確認提醒都已正確附上
+3. 最後檢查 CTA 段落是否明確引導到客戶指定的 CTA 方向，若不夠明確請改寫
+4. 若資料中仍有偏離客戶業別的殘留內容，一併修正或刪除
+
+直接輸出最終大綱。`;
+}
+
+// ── HISTORY ──
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderDB() {
+  const q = (document.getElementById('dbSearch')?.value || '').toLowerCase();
+  const list = getProjects();
+  const filtered = q ? list.filter(p => p.kw.toLowerCase().includes(q)) : list;
+  const countEl = document.getElementById('dbCount');
+  const cont = document.getElementById('dbList');
+  if (countEl) countEl.textContent = q ? `顯示 ${filtered.length} / ${list.length} 筆` : `共 ${list.length} 筆記錄`;
+  if (!cont) return;
+  if (!filtered.length) {
+    cont.innerHTML = `<div class="db-empty"><div class="db-empty-icon">📂</div>${q ? '找不到符合的記錄' : '尚無儲存記錄<br><span style="font-size:13px">完成步驟後點選「儲存」即可建立記錄</span>'}</div>`;
+    return;
+  }
+  cont.innerHTML = filtered.map((proj, i) => {
+    const comp = proj.comp || [];
+    const bizFilled = proj.biz && BIZ_FIELDS.some(id => proj.biz[id]);
+    const dotB = `<div class="db-dot ${bizFilled?'filled':''}">SB</div>`;
+    const dot0 = `<div class="db-dot ${comp.length?'filled':''}">S0</div>`;
+    const dots = dotB + dot0 + [1,2,3,4].map(n=>`<div class="db-dot ${proj.steps[n]?'filled':''}">S${n}</div>`).join('') +
+                 `<div class="db-dot ${proj.final?'filled':''}">S5</div>`;
+    const bizSec = bizFilled ? `
+      <div class="db-section">
+        <div class="db-sec-title">前置設定 · 客戶業別 / CTA 方向</div>
+        <div class="db-content">${escHtml(BIZ_FIELDS.filter(id=>proj.biz[id]).map(id=>`${BIZ_LABELS[id]}：${proj.biz[id]}`).join('\n'))}</div>
+      </div>` : '';
+    const compSec = comp.length ? `
+      <div class="db-section">
+        <div class="db-sec-title">Step 0 · 手動競品大綱（${comp.length} 篇）</div>
+        <div class="db-content">${escHtml(comp.map(d=>`【第${d.index}篇】${d.url?d.url+'\n':''}${d.content}`).join('\n\n'))}</div>
+      </div>` : '';
+    const taSec = proj.ta && TA_FIELDS.some(id => proj.ta[id]) ? `
+      <div class="db-section">
+        <div class="db-sec-title">Step 1 · TA 受眾設定</div>
+        <div class="db-content">${escHtml(TA_FIELDS.filter(id=>proj.ta[id]).map(id=>`${TA_LABELS[id]}：${proj.ta[id]}`).join('\n'))}</div>
+      </div>` : '';
+    const sections = [1,2,3,4].map(n => proj.steps[n] ? `
+      <div class="db-section">
+        <div class="db-sec-title">Step ${n} · ${['Perplexity 分析','ChatGPT 初步大綱','Gemini 優化大綱','NotebookLM 來源對照'][n-1]}</div>
+        <div class="db-content">${escHtml(proj.steps[n])}</div>
+      </div>` : '').join('');
+    const finalSec = proj.final ? `
+      <div class="db-section">
+        <div class="db-sec-title">Step 5 · 最終整合大綱</div>
+        <div class="db-content" style="font-family:'Noto Sans TC',sans-serif;line-height:1.8">${proj.final}</div>
+      </div>` : '';
+    const kwSafe = escHtml(proj.kw);
+    return `<div class="db-card">
+      <div class="db-card-head" onclick="togDB(${i})">
+        <div class="db-kw">${kwSafe}</div>
+        <div class="db-date">${proj.date||''}</div>
+        <div class="db-step-dots">${dots}</div>
+        <span style="font-size:13px;color:var(--text3);margin-left:8px">▾</span>
+      </div>
+      <div class="db-card-body" id="dbb${i}">
+        ${bizSec}${compSec}${taSec}${sections}${finalSec}
+        <div class="db-actions">
+          <button class="btn btn-blue" onclick="loadProj('${kwSafe}')">載入此專案繼續作業</button>
+          <button class="btn btn-ghost" onclick="exportProj('${kwSafe}')">匯出</button>
+          <button class="btn btn-danger" onclick="delProj('${kwSafe}')">刪除</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function togDB(i) { const el=document.getElementById('dbb'+i); if(el) el.classList.toggle('open'); }
+
+function loadProj(k) {
+  const list = getProjects();
+  const proj = list.find(p => p.kw === k);
+  if (!proj) return;
+  document.getElementById('kwInput').value = proj.kw;
+  kw = proj.kw;
+  document.getElementById('kwBadge').textContent = kw;
+  document.getElementById('kwBadge').style.display = 'block';
+  document.getElementById('kwHint4').textContent = kw;
+  if (proj.comp && proj.comp.length) loadCompData(proj.comp);
+  if (proj.biz) setBizData(proj.biz);
+  if (proj.ta) setTAData(proj.ta);
+  for (let n = 1; n <= 4; n++) {
+    const el = document.getElementById('r' + n);
+    if (el && proj.steps[n]) el.value = proj.steps[n];
+  }
+  if (proj.final) setEditorHTML(proj.final);
+  updatePrompts(); updateNav();
+  switchMain('workflow');
+  showToast('已載入專案：' + k, 'green');
+}
+
+function exportProj(k) {
+  const list = getProjects();
+  const proj = list.find(p => p.kw === k);
+  if (!proj) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = proj.final || '';
+  const finalText = tmp.innerText || '（尚無內容）';
+  const comp = proj.comp || [];
+  const compText = comp.length ? comp.map(d=>`第${d.index}篇${d.url?'（'+d.url+'）':''}\n${d.content}`).join('\n\n') : '（尚無內容）';
+  const bizLines = proj.biz && BIZ_FIELDS.some(id => proj.biz[id])
+    ? BIZ_FIELDS.filter(id => proj.biz[id]).map(id => `${BIZ_LABELS[id]}：${proj.biz[id]}`).join('\n')
+    : '（尚無內容）';
+  const taLines = proj.ta
+    ? TA_FIELDS.filter(id => proj.ta[id]).map(id => `${TA_LABELS[id]}：${proj.ta[id]}`).join('\n')
+    : '（尚無內容）';
+  const parts = [
+    '═══════════════════════════════════',
+    'SEO 大綱生產系統 — 完整輸出記錄',
+    '關鍵字：' + proj.kw,
+    '日期：' + (proj.date || ''),
+    '═══════════════════════════════════',
+    '',
+    '【前置設定 ─ 客戶業別 / CTA 方向】',
+    bizLines, '',
+    '【Step 0 ─ 手動競品 H2 大綱】',
+    compText, '',
+    '【Step 1 ─ TA 受眾設定（已確認）】',
+    taLines, '',
+    '【Step 1 ─ Perplexity 意圖+PAA】',
+    proj.steps[1]||'（尚無內容）', '',
+    '【Step 2 ─ ChatGPT 初步大綱】',
+    proj.steps[2]||'（尚無內容）', '',
+    '【Step 3 ─ Gemini 優化大綱】',
+    proj.steps[3]||'（尚無內容）', '',
+    '【Step 4 ─ NotebookLM 來源對照】',
+    proj.steps[4]||'（尚無內容）', '',
+    '【Step 5 ─ 最終整合大綱】',
+    finalText,
+  ];
+  const blob = new Blob([parts.join('\n')], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = proj.kw + '_SEO大綱_' + (proj.date||'').replace(/\//g,'-') + '.txt';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('已匯出：' + proj.kw, 'green');
+}
+
+function exportTxt() {
+  const kwLabel = kw || '（未設定關鍵字）';
+  const compText = getCompText() || '（尚無內容）';
+  const bizText = getBizText() || '（尚無內容）';
+  const taText = getTAText() || '（尚無內容）';
+  const parts = [
+    '═══════════════════════════════════',
+    'SEO 大綱生產系統 — 完整輸出記錄',
+    '關鍵字：' + kwLabel, '日期：' + today(),
+    '═══════════════════════════════════', '',
+    '【前置設定 ─ 客戶業別 / CTA 方向】', bizText, '',
+    '【Step 0 ─ 手動競品 H2 大綱】', compText, '',
+    '【Step 1 ─ TA 受眾設定（已確認）】', taText, '',
+    '【Step 1 ─ Perplexity 意圖分析+PAA】', gv('r1')||'（尚無內容）', '',
+    '【Step 2 ─ ChatGPT 初步大綱】', gv('r2')||'（尚無內容）', '',
+    '【Step 3 ─ Gemini 優化大綱】', gv('r3')||'（尚無內容）', '',
+    '【Step 4 ─ NotebookLM 來源對照】', gv('r4')||'（尚無內容）', '',
+    '【Step 5 ─ 最終整合大綱】', getEditorText()||'（尚無內容）',
+  ];
+  const blob = new Blob([parts.join('\n')], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = kwLabel + '_SEO大綱_' + today().replace(/\//g,'-') + '.txt';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('檔案已匯出', 'green');
+}
+
+function delProj(k) {
+  if (!confirm('確定要刪除「' + k + '」的所有記錄嗎？此操作無法復原。')) return;
+  const list = getProjects().filter(p => p.kw !== k);
+  setProjects(list);
+  renderDB();
+  showToast('已刪除：' + k);
+}
+
+// ── INIT ──
+addComp();
+updatePrompts();
+updateNav();
+</script>
+</body>
+</html>
